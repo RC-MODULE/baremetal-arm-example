@@ -1,10 +1,13 @@
-#include "mem_map.h"
-
-static volatile int g_counter = 0x33333333;
+// 1 or 2 seconds on 300 MHz
+#define DELAY (30*100000)
 
 void main( void )
 {
+	volatile int i;
 	while(1) {
-		g_counter++;
+		*((long int*)0x2002a3fc)=0x40;
+		for(i=0; i<DELAY; i++);
+		*((long int*)0x2002a3fc)=0x00;
+		for(i=0; i<DELAY; i++);
 	}
 }

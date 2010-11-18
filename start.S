@@ -1,10 +1,8 @@
-#include "mem_map.h"
-
 .section ".data"
 .section ".text"
 
 .global main
-;.global _start
+.global _start
 
 _start:
     b start
