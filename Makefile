@@ -4,7 +4,7 @@ CROSS_COMPILE=arm-none-linux-gnueabi-
 endif
 
 # Base address to load the program
-RAM_BASE=0x00100000
+RAM_BASE=0x00100010
 
 AS = $(CROSS_COMPILE)as
 CC = $(CROSS_COMPILE)gcc
@@ -32,13 +32,13 @@ CFLAGS = -nostdinc \
 		-marm -mcpu=arm1176jzf-s
 
 # Name of target program
-PROG=hello-arm
+PROG=ldr
 
 # List of all *c sources
-CSRC=main.c
+CSRC=main.c ddr_init.c
 
 #List of all *S (asm) sources
-ASRC=start.S
+ASRC=start.S longjump.S
 
 COBJ = $(subst .c,.o,$(CSRC))
 AOBJ = $(subst .S,.o,$(ASRC))
@@ -74,10 +74,15 @@ disassemble: $(PROG).elf
 # Connect to the remote gdb and start debugging
 debug: $(PROG).bin
 	rm .gdbscript ; \
-	echo 'target remote 10.7.9.42:4000' >> .gdbscript ; \
+	echo 'target remote 10.7.9.19:4000' >> .gdbscript ; \
 	echo 'restore $(PROG).bin binary $(RAM_BASE)' >> .gdbscript ; \
 	echo 'jump *$(RAM_BASE)' >> .gdbscript ; \
 	$(GDB) -x .gdbscript $(PROG).elf ;
 
-
-
+$(PROG).img:	$(PROG).bin u-boot.bin
+	dd if=/dev/zero of=$(PROG).img seek=0 bs=1 count=16; \
+ 	dd if=$(PROG).bin of=$(PROG).img seek=16 bs=1;\
+ 	dd if=u-boot.bin of=$(PROG).img seek=2048 bs=1
+ 	
+ 	
+ 	 
