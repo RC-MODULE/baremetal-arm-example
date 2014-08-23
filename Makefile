@@ -38,12 +38,12 @@ PROG=ldr
 CSRC=main.c ddr_init.c
 
 #List of all *S (asm) sources
-ASRC=start.S longjump.S
+ASRC=start.S
 
 COBJ = $(subst .c,.o,$(CSRC))
 AOBJ = $(subst .S,.o,$(ASRC))
 
-all: $(PROG).bin
+all: $(PROG).signed.bin
 
 $(AOBJ): %.o : %.S
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -67,6 +67,10 @@ clean:
 	rm -f *.hex
 	rm -f *.dmp
 
+
+$(PROG).signed.bin: $(PROG).bin
+	$(SILENT_MD5)./sign.sh $^ $(@) 2>/dev/null
+
 # Show the disassembly
 disassemble: $(PROG).elf
 	$(OBJDUMP) -d $(PROG).elf
@@ -79,8 +83,7 @@ debug: $(PROG).bin
 	echo 'jump *$(RAM_BASE)' >> .gdbscript ; \
 	$(GDB) -x .gdbscript $(PROG).elf ;
 
-$(PROG).img:	$(PROG).bin u-boot.bin
+$(PROG).img:	$(PROG).signed.bin u-boot.bin
 	dd if=/dev/zero of=$(PROG).img seek=0 bs=1 count=16; \
-	dd if=$(PROG).bin of=$(PROG).img seek=16 bs=1;\
+	dd if=$(PROG).signed.bin of=$(PROG).img seek=16 bs=1;\
 	dd if=u-boot.bin of=$(PROG).img seek=2048 bs=1
-

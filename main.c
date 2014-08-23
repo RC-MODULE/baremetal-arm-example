@@ -1,5 +1,6 @@
-// 1 or 2 seconds on 300 MHz
 #include "uemd_early.h"
+
+// ~ 1 or 2 seconds on 300 MHz
 #define DELAY (30*10000)
 #ifndef bool
 #define bool int
@@ -21,11 +22,16 @@ int (*nand_read)(struct uemd_nand_state *state, int start, void *dest, int words
 int (*otp_create)(struct uemd_otp *otp);
 
 
+void __attribute__((naked,noreturn)) uemd_longjump(unsigned long* image_address)
+{
+    asm volatile("bx r0");
+}
+
+
 /* NAND layout */
 /* 0x0: checksum */
-/* 0x10: nanoloader */
-/* 0x40000: uboot */
-
+/* 0x10: we are here */
+/* 0x40000: something we load */
 
 
 void main( void )
