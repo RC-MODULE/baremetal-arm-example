@@ -44,13 +44,13 @@ COBJ = $(subst .c,.o,$(CSRC))
 AOBJ = $(subst .S,.o,$(ASRC))
 
 all: $(PROG).bin
-	
+
 $(AOBJ): %.o : %.S
 	$(CC) $(CFLAGS) -c -o $@ $<
-	
+
 $(COBJ): %.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
-	
+
 $(PROG).elf: $(COBJ) $(AOBJ)
 	$(LD) -T boot.lds -Ttext=$(RAM_BASE) $^ -o $@
 
@@ -81,8 +81,6 @@ debug: $(PROG).bin
 
 $(PROG).img:	$(PROG).bin u-boot.bin
 	dd if=/dev/zero of=$(PROG).img seek=0 bs=1 count=16; \
- 	dd if=$(PROG).bin of=$(PROG).img seek=16 bs=1;\
- 	dd if=u-boot.bin of=$(PROG).img seek=2048 bs=1
- 	
- 	
- 	 
+	dd if=$(PROG).bin of=$(PROG).img seek=16 bs=1;\
+	dd if=u-boot.bin of=$(PROG).img seek=2048 bs=1
+
